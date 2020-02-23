@@ -74,7 +74,7 @@ describe("API", () => {
           .send({ hobbies: [hobbyId] })
           .set("Authorization", global.bearerToken)
           .expect(res => {
-            res.status.should.equal(201);
+            res.status.should.equal(200);
             res.body.should.have.property("hobbies").be.an("array");
           })
           .end(done);

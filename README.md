@@ -44,6 +44,12 @@ To start the application in development mode, run:
 npm install
 ```
 
+Instantiate mongo if not instantiated:
+
+```
+mongod
+```
+
 Start the application in dev env:
 
 ```
