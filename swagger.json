@@ -1,0 +1,634 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Mercavus User-Hobby - Node.js, MongoDB, Typescript API",
+    "version": "1.0.0",
+    "description": "TypeScript, Express, JWT Auth, Mongoose"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000"
+    }
+  ],
+  "paths": {
+    "/auth/signup/": {
+      "post": {
+        "description": "Register user to application",
+        "tags": ["auth"],
+        "requestBody": {
+          "description": "sign up body",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserSchema"
+              },
+              "example": {
+                "email": "test.user@mail.com",
+                "password": "test_test"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "user successfuly signed up",
+            "content": {
+              "appication/json": {
+                "example": {
+                  "message": "You have signed up successfully"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "sign up failed",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Email already exists"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login/": {
+      "post": {
+        "description": "Login user to application",
+        "tags": ["auth"],
+        "requestBody": {
+          "description": "login body",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserSchema"
+              },
+              "example": {
+                "email": "test.user@mail.com",
+                "password": "test_test"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "user successfuly logged in",
+            "headers": {
+              "Authorization": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "JWT token"
+              }
+            },
+            "content": {
+              "appication/json": {
+                "example": {
+                  "message": "Login Success!"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not logged in, invalid credentials",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Invalid credentials"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/user/": {
+      "get": {
+        "description": "Get authenticated user",
+        "tags": ["auth"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "return authenticated user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/UserSchema"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/v1/users": {
+      "get": {
+        "description": "Get all stored users in Database",
+        "tags": ["users"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/UserSchema"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Create new User",
+        "tags": ["users"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/User",
+          "description": "user creation request body",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserSchema"
+              },
+              "example": {
+                "name": "John Doe",
+                "email": "test.user@mail.com"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "return created user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/UserSchema"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/users/{id}": {
+      "get": {
+        "description": "Get user by userId",
+        "tags": ["users"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "the unique userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "return user by id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/UserSchema"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "Updates user by userId",
+        "tags": ["users"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "the unique userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "return updated user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/UserSchema"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete user by userId",
+        "tags": ["users"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "the unique userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "return deleted user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/UserSchema"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/hobbies": {
+      "get": {
+        "description": "Get all stored hobbies in Database",
+        "tags": ["hobbies"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of hobbies",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/HobbySchema"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Create new Hobby",
+        "tags": ["hobbies"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/Hobby",
+          "description": "hobby creation request body",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HobbySchema"
+              },
+              "example": {
+                "name": "userName",
+                "passionLevel": 10,
+                "year": 2015
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "return created hobby",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/HobbySchema"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/hobbies/{id}": {
+      "get": {
+        "description": "Get hobby by hobbyId",
+        "tags": ["hobbies"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "the unique hobbyId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "return hobby by id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/HobbySchema"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "Updates hobby by hobbyId",
+        "tags": ["hobbies"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "the unique hobbyId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "return updated hobby",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/HobbySchema"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete hobby by hobbyId",
+        "tags": ["hobbies"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "the unique hobbyId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "return deleted hobby",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/HobbySchema"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UserSchema": {
+        "required": ["email", "name"],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "hobbies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HobbySchema"
+            }
+          }
+        }
+      },
+      "HobbySchema": {
+        "required": ["name", "passionLevel", "year"],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "passionLevel": {
+            "type": "number"
+          },
+          "year": {
+            "type": "number"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": ["status", "message"],
+        "properties": {
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code",
+            "example": 200
+          },
+          "message": {
+            "type": "string",
+            "description": "Error description",
+            "example": "User created"
+          }
+        }
+      }
+    },
+    "requestBodies": {
+      "User": {
+        "description": "User object that needs to be added",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/UserSchema"
+            }
+          }
+        }
+      },
+      "Hobby": {
+        "description": "Hobby object that needs to be added",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/HobbySchema"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "tags": []
+}
